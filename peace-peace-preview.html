@@ -1,0 +1,1036 @@
+<!--
+  ═══════════════════════════════════════════════════════════════════
+   peace, peace! — IG profile preview (client-facing)
+   Designed to look like a real Instagram profile page.
+   Self-contained. Paste into Tilda T123 when ready.
+
+   KENNY — edit FILES (line ~280) + CONFIG (line ~315) only.
+  ═══════════════════════════════════════════════════════════════════
+-->
+
+<style>
+/* ─── RESET (scoped) ────────────────────────────────────────────── */
+#pp-ig, #pp-ig * { box-sizing: border-box; margin: 0; padding: 0; }
+#pp-ig button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; padding: 0; }
+#pp-ig img, #pp-ig video { display: block; max-width: 100%; }
+#pp-ig a { color: inherit; text-decoration: none; }
+
+/* ─── BASE ──────────────────────────────────────────────────────── */
+#pp-ig {
+  --bg:         #ffffff;
+  --text:       #262626;
+  --text-2:     #737373;
+  --text-3:     #8e8e8e;
+  --border:     #dbdbdb;
+  --border-2:   #efefef;
+  --hover:      #fafafa;
+  --link:       #00376b;
+  --blue:       #0095f6;
+  --red:        #ed4956;
+  --grad-a:     #feda75;
+  --grad-b:     #fa7e1e;
+  --grad-c:     #d62976;
+  --grad-d:     #962fbf;
+  --grad-e:     #4f5bd5;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+.pp-shell {
+  max-width: 935px;
+  margin: 0 auto;
+  padding: 30px 20px 60px;
+}
+
+/* ─── TOP BAR (pre-launch label) ────────────────────────────────── */
+.pp-pretop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0 18px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-2);
+  margin-bottom: 30px;
+}
+.pp-pretop-right { display: flex; gap: 18px; align-items: center; }
+.pp-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--red);
+  display: inline-block;
+  margin-right: 6px;
+  animation: pp-pulse 2.2s ease-in-out infinite;
+}
+@keyframes pp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ─── PROFILE HEADER ────────────────────────────────────────────── */
+.pp-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 22px;
+  padding: 10px 0 44px;
+}
+
+/* avatar */
+.pp-avatar-wrap {
+  padding: 4px;
+  border-radius: 50%;
+  background: conic-gradient(from 180deg, var(--grad-a), var(--grad-b), var(--grad-c), var(--grad-d), var(--grad-e), var(--grad-a));
+}
+.pp-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: #0a0807;
+  border: 3px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: 'Times New Roman', Times, serif;
+  font-style: italic;
+  font-weight: 400;
+  color: #ece4d6;
+  font-size: 52px;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.pp-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+/* username row */
+.pp-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.pp-username {
+  font-size: 20px;
+  font-weight: 400;
+}
+.pp-verified {
+  width: 16px; height: 16px;
+  color: var(--blue);
+  flex-shrink: 0;
+}
+.pp-btn {
+  background: var(--border-2);
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  transition: background 0.15s;
+}
+.pp-btn:hover { background: #e0e0e0; }
+.pp-btn-icon {
+  width: 32px; height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+.pp-btn-icon:hover { background: var(--border-2); }
+
+/* stats */
+.pp-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  font-size: 16px;
+}
+.pp-stats strong { font-weight: 600; }
+.pp-stats .pp-stat-dim strong { color: var(--text-3); font-weight: 400; }
+
+/* bio */
+.pp-bio {
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 540px;
+  text-align: center;
+}
+.pp-bio .pp-display-name { font-weight: 600; margin-right: 4px; display: inline; }
+.pp-bio .pp-bio-label { color: var(--text-3); font-size: 12px; margin-right: 4px; }
+.pp-bio .pp-link { color: var(--link); font-weight: 500; }
+.pp-bio .pp-link:hover { text-decoration: underline; }
+
+/* mobile profile */
+@media (max-width: 735px) {
+  .pp-shell { padding: 16px 0 40px; }
+  .pp-pretop { padding: 0 16px 14px; margin-bottom: 20px; }
+  .pp-profile {
+    gap: 14px;
+    padding: 4px 16px 20px;
+  }
+  .pp-avatar { width: 96px; height: 96px; font-size: 34px; border-width: 2px; }
+  .pp-name-row { font-size: 16px; gap: 10px; }
+  .pp-username { font-size: 18px; }
+  .pp-stats {
+    width: 100%;
+    justify-content: space-around;
+    gap: 0;
+    padding: 12px 0;
+    border-top: 1px solid var(--border-2);
+    border-bottom: 1px solid var(--border-2);
+    font-size: 14px;
+  }
+  .pp-stats > div { display: flex; flex-direction: column; gap: 2px; }
+  .pp-stats strong { display: block; }
+  .pp-bio {
+    padding: 0 4px;
+  }
+}
+
+/* ─── HIGHLIGHTS ROW ────────────────────────────────────────────── */
+.pp-highlights {
+  display: flex;
+  gap: 38px;
+  padding: 8px 0 40px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.pp-highlights::-webkit-scrollbar { display: none; }
+.pp-hl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  cursor: default;
+}
+.pp-hl-bubble {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--border-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: var(--text-3);
+  overflow: hidden;
+}
+.pp-hl-label {
+  font-size: 12px;
+  font-weight: 500;
+  max-width: 88px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 735px) {
+  .pp-highlights { padding: 8px 16px 20px; gap: 14px; }
+  .pp-hl-bubble { width: 64px; height: 64px; font-size: 22px; }
+  .pp-hl-label { max-width: 64px; font-size: 11px; }
+}
+
+/* ─── TAB BAR ───────────────────────────────────────────────────── */
+.pp-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  border-top: 1px solid var(--border-2);
+}
+.pp-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 15px 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  border-top: 1px solid transparent;
+  margin-top: -1px;
+  cursor: default;
+}
+.pp-tab.active {
+  color: var(--text);
+  border-top-color: var(--text);
+}
+.pp-tab svg { width: 12px; height: 12px; }
+@media (max-width: 735px) {
+  .pp-tabs { gap: 0; justify-content: space-around; }
+  .pp-tab span { display: none; }
+  .pp-tab { padding: 12px 24px; }
+  .pp-tab svg { width: 24px; height: 24px; }
+}
+
+/* ─── GRID ──────────────────────────────────────────────────────── */
+.pp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 28px 0 0;
+}
+@media (max-width: 735px) {
+  .pp-grid { gap: 2px; padding: 2px 0 0; }
+}
+
+.pp-tile {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--hover);
+  cursor: pointer;
+}
+.pp-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+.pp-tile:hover::before { opacity: 1; }
+.pp-tile-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pp-tile-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: white;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+  width: 22px; height: 22px;
+  z-index: 3;
+  pointer-events: none;
+}
+.pp-tile-hover-meta {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+.pp-tile-hover-meta svg { width: 22px; height: 22px; fill: white; }
+.pp-tile-hover-meta > div { display: flex; align-items: center; gap: 8px; }
+.pp-tile:hover .pp-tile-hover-meta { opacity: 1; }
+
+.pp-tile-flag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 5;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* ─── MODAL ─────────────────────────────────────────────────────── */
+.pp-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: pp-fade 0.2s ease;
+}
+.pp-modal.open { display: flex; }
+@keyframes pp-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.pp-modal-card {
+  background: white;
+  border-radius: 12px;
+  max-width: 1100px;
+  width: 100%;
+  max-height: calc(100vh - 48px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 405px;
+  overflow: hidden;
+  position: relative;
+}
+@media (max-width: 900px) {
+  .pp-modal-card {
+    grid-template-columns: 1fr;
+    max-width: 540px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+  }
+}
+
+.pp-modal-media {
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 300px;
+  aspect-ratio: 4 / 5;
+  max-height: calc(100vh - 48px);
+}
+@media (max-width: 900px) { .pp-modal-media { max-height: 70vh; } }
+.pp-modal-media img,
+.pp-modal-media video {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* carousel */
+.pp-car-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.pp-car-arrow:hover { background: white; }
+.pp-car-arrow.prev { left: 12px; }
+.pp-car-arrow.next { right: 12px; }
+.pp-car-dots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+}
+.pp-car-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+}
+.pp-car-dot.active { background: var(--blue); }
+
+/* sidebar */
+.pp-side {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: white;
+}
+@media (max-width: 900px) { .pp-side { max-height: none; } }
+
+.pp-side-head {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-2);
+  flex-shrink: 0;
+}
+.pp-side-head-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: conic-gradient(from 180deg, var(--grad-a), var(--grad-b), var(--grad-c), var(--grad-d), var(--grad-e), var(--grad-a));
+  padding: 2px;
+  flex-shrink: 0;
+}
+.pp-side-head-avatar > div {
+  width: 100%; height: 100%; border-radius: 50%;
+  background: #0a0807;
+  border: 2px solid white;
+  display: flex; align-items: center; justify-content: center;
+  color: #ece4d6;
+  font-family: 'Times New Roman', Times, serif;
+  font-style: italic;
+  font-size: 14px;
+}
+.pp-side-head-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid white; }
+.pp-side-head-name {
+  font-size: 14px;
+  font-weight: 600;
+  flex: 1;
+}
+.pp-side-head-menu { font-size: 20px; color: var(--text); letter-spacing: 2px; }
+
+.pp-side-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  min-height: 100px;
+}
+.pp-caption {
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.pp-caption .pp-cap-user {
+  font-weight: 600;
+  margin-right: 6px;
+}
+.pp-hashtags {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--link);
+  word-break: break-word;
+}
+
+.pp-note-flag {
+  margin-top: 14px;
+  font-size: 12px;
+  padding: 10px 12px;
+  background: #fff5f5;
+  border: 1px solid #ffe0e3;
+  border-radius: 6px;
+  color: #b02a37;
+  line-height: 1.4;
+}
+.pp-note-flag strong { font-weight: 600; }
+
+.pp-side-meta {
+  margin-top: 18px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  text-transform: uppercase;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.pp-side-meta-chip {
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.pp-side-actions {
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-top: 1px solid var(--border-2);
+  flex-shrink: 0;
+}
+.pp-icon-btn {
+  width: 24px; height: 24px;
+  color: var(--text);
+  cursor: default;
+}
+.pp-icon-btn svg { width: 100%; height: 100%; }
+.pp-icon-btn.bookmark { margin-left: auto; }
+
+.pp-side-footer {
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--border-2);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  background: #fafafa;
+}
+.pp-copy-btn {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.pp-copy-btn:hover { background: var(--border-2); }
+.pp-copy-btn.copied { border-color: var(--blue); color: var(--blue); }
+
+.pp-close {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  color: white;
+  font-size: 28px;
+  font-weight: 300;
+  width: 40px; height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+}
+.pp-close:hover { opacity: 0.8; }
+
+.pp-post-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.3);
+  color: white;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  z-index: 10001;
+  transition: background 0.15s;
+}
+.pp-post-nav:hover { background: rgba(255,255,255,0.5); }
+.pp-post-nav:disabled { opacity: 0.2; cursor: not-allowed; }
+.pp-post-nav.prev-post { left: 16px; }
+.pp-post-nav.next-post { right: 16px; }
+
+@media (max-width: 900px) {
+  .pp-post-nav { top: auto; bottom: 16px; transform: none; }
+  .pp-post-nav.prev-post { left: 16px; }
+  .pp-post-nav.next-post { right: 16px; }
+}
+</style>
+
+<div id="pp-ig">
+  <div class="pp-shell">
+
+    <!-- preview label -->
+    <div class="pp-pretop">
+      <span><span class="pp-dot"></span>Client Preview · Pre-launch</span>
+      <span class="pp-pretop-right">
+        <span>Campaign Wave 1</span>
+        <span>9 Posts</span>
+      </span>
+    </div>
+
+    <!-- profile header -->
+    <div class="pp-profile">
+      <div class="pp-avatar-wrap">
+        <div class="pp-avatar" id="pp-avatar">pp</div>
+      </div>
+
+      <div class="pp-name-row">
+        <span class="pp-username" id="pp-username"></span>
+        <svg class="pp-verified" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M23 12l-2.44-2.78.34-3.68-3.61-.82-1.89-3.18L12 2.96 8.6 1.54 6.71 4.72l-3.61.81.34 3.68L1 12l2.44 2.78-.34 3.69 3.61.82 1.89 3.18L12 21.04l3.4 1.42 1.89-3.18 3.61-.82-.34-3.68L23 12zm-12.91 4.72l-3.8-3.81 1.48-1.48 2.32 2.33 5.85-5.87 1.48 1.48-7.33 7.35z"/>
+        </svg>
+        <button class="pp-btn">Edit profile</button>
+        <button class="pp-btn">View archive</button>
+        <button class="pp-btn-icon" aria-label="Settings">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+
+      <div class="pp-stats">
+        <div><strong>9</strong> posts</div>
+        <div class="pp-stat-dim"><strong>—</strong> followers</div>
+        <div class="pp-stat-dim"><strong>—</strong> following</div>
+      </div>
+
+      <div class="pp-bio" id="pp-bio"></div>
+    </div>
+
+    <!-- tab bar -->
+    <div class="pp-tabs">
+      <div class="pp-tab active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Posts</span>
+      </div>
+      <div class="pp-tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 8 4 4-4 4"/><rect x="2" y="2" width="20" height="20" rx="2"/><path d="m22 8-4 4 4 4"/><path d="M6 2v20"/><path d="M18 2v20"/></svg>
+        <span>Reels</span>
+      </div>
+      <div class="pp-tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Tagged</span>
+      </div>
+    </div>
+
+    <!-- grid -->
+    <div class="pp-grid" id="pp-grid"></div>
+
+  </div>
+
+  <!-- modal -->
+  <div class="pp-modal" id="pp-modal">
+    <button class="pp-close" id="pp-close" aria-label="Close">×</button>
+    <button class="pp-post-nav prev-post" id="pp-prev-post" aria-label="Previous post">‹</button>
+    <button class="pp-post-nav next-post" id="pp-next-post" aria-label="Next post">›</button>
+    <div class="pp-modal-card" id="pp-modal-card"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ════════════════════════════════════════════════════════════════
+     KENNY — EDIT THIS SECTION ONLY
+
+     FILES: swap these paths for Tilda URLs when deploying.
+     CONFIG: username, bio, avatar, display name — tweak freely.
+     ════════════════════════════════════════════════════════════════ */
+
+  // ─── LOCAL PREVIEW MODE ────────────────────────────────────────
+  // Paths assume this HTML file sits directly in /Users/kenny/Downloads/
+  // alongside the "peace, peace! social posts" folder.
+  // When you move to Tilda, swap each path for a Tilda/Vimeo URL.
+  const FOLDER = "peace, peace! social posts";
+  const FILES = {
+    post1:   `${FOLDER}/peace,peace! - 1.png`,
+    post2:   `${FOLDER}/peace,peace! - 2.mp4`,
+    post4:   `${FOLDER}/peace,peace! - 4.mp4`,
+    post5:   `${FOLDER}/peace,peace! - 5.png`,
+    post7:   `${FOLDER}/peace,peace! - 7.mp4`,
+    post9:   `${FOLDER}/peace,peace! - 9.png`,
+    post3_1: `${FOLDER}/peace,peace! - 3/1.png`,
+    post3_2: `${FOLDER}/peace,peace! - 3/2.png`,
+    post3_3: `${FOLDER}/peace,peace! - 3/3.png`,
+    post6_1: `${FOLDER}/peace,peace! - 6/1.png`,
+    post6_2: `${FOLDER}/peace,peace! - 6/2.png`,
+    post6_3: `${FOLDER}/peace,peace! - 6/3.png`,
+    post6_4: `${FOLDER}/peace,peace! - 6/4.png`,
+    post6_5: `${FOLDER}/peace,peace! - 6/5.png`,
+    post6_6: `${FOLDER}/peace,peace! - 6/6.png`,
+    post8_1: `${FOLDER}/peace,peace! - 8/1.png`,
+    post8_2: `${FOLDER}/peace,peace! - 8/2.png`,
+    post8_3: `${FOLDER}/peace,peace! - 8/3.png`,
+
+    // Reel thumbnail covers (shown on grid instead of video first-frame) ─
+    thumb2:  `${FOLDER}/peace,peace! - thumbnail covers for reels 2,4,7/thumbnail for 2.png`,
+    thumb4:  `${FOLDER}/peace,peace! - thumbnail covers for reels 2,4,7/thumbnail for 4.png`,
+    thumb7:  `${FOLDER}/peace,peace! - thumbnail covers for reels 2,4,7/thumbnail for 7.png`,
+  };
+
+  const CONFIG = {
+    username:    "peace.peace.film",
+    displayName: "Peace, Peace!",
+    avatarUrl:   "",           // put URL here to use a real image; empty = "pp" monogram
+    bioLabel:    "Short Film",
+    bioLines: [
+      "An hour before his mother's funeral,",
+      "everything begins to unravel.",
+      "🎬 Dir. Dylan Brown · ca. 2026"
+    ],
+    bioLink: { text: "kennyproduces.com", url: "https://kennyproduces.com" }
+  };
+
+  /* ════════════════════════════════════════════════════════════════
+     POST DATA
+     ════════════════════════════════════════════════════════════════ */
+
+  const POSTS = [
+    {
+      n: 1, type: 'photo',
+      media: [FILES.post1],
+      caption: "An hour before his mother's funeral, everything begins to unravel.",
+      hashtags: "#PeacePeaceFilm #ShortFilm #IndieFilm #FilmStill #Cinematic"
+    },
+    {
+      n: 2, type: 'reel',
+      media: [FILES.post2],
+      thumb: FILES.thumb2,
+      caption: "An hour before his mother's funeral, everything begins to unravel.",
+      hashtags: "#PeacePeaceFilm #ShortFilm #IndieFilm #FilmFestival #Cinematic"
+    },
+    {
+      n: 3, type: 'carousel',
+      media: [FILES.post3_1, FILES.post3_2, FILES.post3_3],
+      caption: "Eddy has spent his life keeping the peace. Some things were never said.",
+      hashtags: "#PeacePeaceFilm #Eddy #CharacterPost #ShortFilm #IndieFilm"
+    },
+    {
+      n: 4, type: 'reel',
+      media: [FILES.post4],
+      thumb: FILES.thumb4,
+      caption: "An hour before his mother's funeral, everything begins to unravel.",
+      hashtags: "#PeacePeaceFilm #ShortFilm #IndieFilm #FilmFestival #Cinematic"
+    },
+    {
+      n: 5, type: 'photo',
+      media: [FILES.post5],
+      caption: "When his brother refuses to deliver the eulogy, a long-buried truth surfaces. Festival submissions underway.",
+      hashtags: "#PeacePeaceFilm #ShortFilm #IndieFilm #FilmStill #Cinematic",
+      note_flag: "Placeholder artwork — final poster pending."
+    },
+    {
+      n: 6, type: 'carousel',
+      media: [FILES.post6_1, FILES.post6_2, FILES.post6_3, FILES.post6_4, FILES.post6_5, FILES.post6_6],
+      caption: "Behind the scenes. A small set. A heavy story.",
+      hashtags: "#PeacePeaceFilm #BTS #BehindTheScenes #ShortFilm #IndieFilm",
+      note_flag: "Caption rewritten from Canva notes — verify before publishing."
+    },
+    {
+      n: 7, type: 'reel',
+      media: [FILES.post7],
+      thumb: FILES.thumb7,
+      caption: "Something is already wrong before anyone says it out loud.",
+      hashtags: "#PeacePeaceFilm #Reel #ShortFilm #IndieCinema #FilmMood"
+    },
+    {
+      n: 8, type: 'carousel',
+      media: [FILES.post8_1, FILES.post8_2, FILES.post8_3],
+      caption: "Some things don't need to be said to be understood.",
+      hashtags: "#PeacePeaceFilm #Eddy #CharacterPost #ShortFilm #IndieFilm",
+      note_flag: "Slide 1 still has placeholder overlay — swap for final still."
+    },
+    {
+      n: 9, type: 'photo',
+      media: [FILES.post9],
+      caption: "A short film about what happens when everything is held in… until it isn't.\n— Dylan Brown, Director",
+      hashtags: "#PeacePeaceFilm #FilmFestival #ShortFilm #IndieFilm #DirectorVision"
+    }
+  ];
+
+  // IG grids display newest-first (top-left). POSTS is authored in publish
+  // order 1 → 9, so reverse for display. Modal nav follows grid order.
+  POSTS.reverse();
+
+  /* ════════════════════════════════════════════════════════════════
+     ICONS
+     ════════════════════════════════════════════════════════════════ */
+
+  const ICON_REEL = `<svg class="pp-tile-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.93 2.045c-.546.056-2.517.344-4.247 1.64C4.808 5.117 3.797 6.855 3.319 8.024q-.083.203-.159.411a13 13 0 0 0-.756 4.823q.02 1.203.186 2.102c.148.818.393 1.63.962 2.512c1.368 2.116 3.658 3.96 6.083 4.702q.489.157.957.263q.934.22 1.86.251q.423.017.837.001c2.521-.086 4.659-.988 5.976-2.013c1.717-1.337 2.656-3.078 3.01-4.116c.17-.491.332-1.064.45-1.693q.034-.185.064-.373q.06-.374.1-.758q.04-.395.056-.797q.012-.207.015-.412q.042-2.633-.842-4.95c-.56-1.469-1.735-3.068-3.616-4.22l-.154-.092a11 11 0 0 0-1.864-.889q-.358-.129-.716-.232a10.3 10.3 0 0 0-2.796-.399q-.342-.005-.683.008a13 13 0 0 0-1.257.096m4.005 10.563l-5.72 3.363c-.46.27-1.162.188-1.162-.665V8.556c0-.767.687-1.05 1.162-.766l5.72 3.672c.46.284.48.98 0 1.146"/></svg>`;
+  const ICON_CAROUSEL = `<svg class="pp-tile-icon" viewBox="0 0 48 48" fill="currentColor" aria-hidden="true"><path d="M34.02 6.75H13.98a7.25 7.25 0 0 0-7.25 7.25v20.04a7.25 7.25 0 0 0 7.25 7.25h20.04a7.25 7.25 0 0 0 7.25-7.25V14a7.25 7.25 0 0 0-7.25-7.25m-20.04 1.5h20.04a5.75 5.75 0 0 1 5.75 5.75v20.04a5.75 5.75 0 0 1-5.75 5.75H13.98a5.75 5.75 0 0 1-5.75-5.75V14a5.75 5.75 0 0 1 5.75-5.75M43.55 16.27a.75.75 0 0 0-1.5 0V37.7a3.27 3.27 0 0 1-3.28 3.27.75.75 0 0 0 0 1.5 4.77 4.77 0 0 0 4.78-4.77z"/></svg>`;
+
+  /* ════════════════════════════════════════════════════════════════
+     RENDERING
+     ════════════════════════════════════════════════════════════════ */
+
+  const isVideo = url => /\.(mp4|webm|mov)(\?|$)/i.test(url || '');
+
+  function initProfile() {
+    document.getElementById('pp-username').textContent = CONFIG.username;
+    const avatar = document.getElementById('pp-avatar');
+    if (CONFIG.avatarUrl) {
+      avatar.innerHTML = `<img src="${CONFIG.avatarUrl}" alt="${CONFIG.username}">`;
+    }
+    const bio = document.getElementById('pp-bio');
+    bio.innerHTML = `
+      <div><span class="pp-display-name">${escapeHtml(CONFIG.displayName)}</span><span class="pp-bio-label">· ${escapeHtml(CONFIG.bioLabel)}</span></div>
+      ${CONFIG.bioLines.map(l => `<div>${escapeHtml(l)}</div>`).join('')}
+      <div><a class="pp-link" href="${CONFIG.bioLink.url}" target="_blank" rel="noopener">🔗 ${escapeHtml(CONFIG.bioLink.text)}</a></div>
+    `;
+  }
+
+  function buildGrid() {
+    const grid = document.getElementById('pp-grid');
+    grid.innerHTML = '';
+    POSTS.forEach((p, i) => {
+      const tile = document.createElement('div');
+      tile.className = 'pp-tile';
+
+      const first = p.media[0];
+      let mediaEl;
+      if (p.thumb) {
+        // explicit thumbnail provided (e.g. reel cover) — show still, keep video for modal
+        mediaEl = `<img class="pp-tile-media" src="${p.thumb}" alt="Post ${p.n}" loading="lazy">`;
+      } else if (p.type === 'reel' || isVideo(first)) {
+        mediaEl = `<video class="pp-tile-media" src="${first}" muted playsinline preload="metadata"></video>`;
+      } else {
+        mediaEl = `<img class="pp-tile-media" src="${first}" alt="Post ${p.n}" loading="lazy">`;
+      }
+
+      let icon = '';
+      if (p.type === 'reel')     icon = ICON_REEL;
+      if (p.type === 'carousel') icon = ICON_CAROUSEL;
+
+      tile.innerHTML = `
+        ${mediaEl}
+        ${icon}
+        ${p.note_flag ? '<div class="pp-tile-flag" title="Has production note"></div>' : ''}
+        <div class="pp-tile-hover-meta">
+          <div><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>0</div>
+          <div><svg viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>0</div>
+        </div>
+      `;
+      tile.addEventListener('click', () => openModal(i));
+      grid.appendChild(tile);
+    });
+  }
+
+  /* ── MODAL ────────────────────────────────────────────────── */
+
+  let currentIdx = 0;
+  let carouselIdx = 0;
+
+  function openModal(i) {
+    currentIdx = i;
+    carouselIdx = 0;
+    renderModal();
+    document.getElementById('pp-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('pp-modal').classList.remove('open');
+    document.body.style.overflow = '';
+    const v = document.querySelector('#pp-modal video');
+    if (v) v.pause();
+  }
+
+  function renderModal() {
+    const p = POSTS[currentIdx];
+    const card = document.getElementById('pp-modal-card');
+
+    let mediaBlock;
+    if (p.type === 'carousel') {
+      const src = p.media[carouselIdx];
+      mediaBlock = `
+        <div class="pp-modal-media">
+          <img src="${src}" alt="Post ${p.n} slide ${carouselIdx+1}">
+          ${p.media.length > 1 ? `
+            ${carouselIdx > 0 ? '<button class="pp-car-arrow prev" id="pp-car-prev" aria-label="Previous slide">‹</button>' : ''}
+            ${carouselIdx < p.media.length - 1 ? '<button class="pp-car-arrow next" id="pp-car-next" aria-label="Next slide">›</button>' : ''}
+            <div class="pp-car-dots">
+              ${p.media.map((_, i) => `<div class="pp-car-dot${i === carouselIdx ? ' active' : ''}"></div>`).join('')}
+            </div>` : ''}
+        </div>
+      `;
+    } else if (p.type === 'reel' || isVideo(p.media[0])) {
+      mediaBlock = `<div class="pp-modal-media"><video src="${p.media[0]}" controls autoplay playsinline></video></div>`;
+    } else {
+      mediaBlock = `<div class="pp-modal-media"><img src="${p.media[0]}" alt="Post ${p.n}"></div>`;
+    }
+
+    const avatarInner = CONFIG.avatarUrl
+      ? `<img src="${CONFIG.avatarUrl}" alt="${CONFIG.username}">`
+      : `<div>pp</div>`;
+
+    card.innerHTML = `
+      ${mediaBlock}
+      <div class="pp-side">
+        <div class="pp-side-head">
+          <div class="pp-side-head-avatar">${avatarInner}</div>
+          <div class="pp-side-head-name">${escapeHtml(CONFIG.username)}</div>
+          <div class="pp-side-head-menu">⋯</div>
+        </div>
+
+        <div class="pp-side-body">
+          <div class="pp-caption">
+            <span class="pp-cap-user">${escapeHtml(CONFIG.username)}</span>${escapeHtml(p.caption)}
+          </div>
+          <div class="pp-hashtags">${escapeHtml(p.hashtags)}</div>
+          ${p.note_flag ? `<div class="pp-note-flag"><strong>▲ Production note ·</strong> ${escapeHtml(p.note_flag)}</div>` : ''}
+          <div class="pp-side-meta">
+            <span class="pp-side-meta-chip">Post ${String(p.n).padStart(2,'0')} / 09</span>
+            <span class="pp-side-meta-chip">${p.type.toUpperCase()}${p.type === 'carousel' ? ' · ' + p.media.length + ' slides' : ''}</span>
+          </div>
+        </div>
+
+        <div class="pp-side-actions">
+          <div class="pp-icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+          <div class="pp-icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+          <div class="pp-icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+          <div class="pp-icon-btn bookmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+        </div>
+
+        <div class="pp-side-footer">
+          <button class="pp-copy-btn" data-copy="caption">Copy caption</button>
+          <button class="pp-copy-btn" data-copy="hashtags">Copy hashtags</button>
+          <button class="pp-copy-btn" data-copy="both">Copy both</button>
+        </div>
+      </div>
+    `;
+
+    // wire copy buttons
+    card.querySelectorAll('[data-copy]').forEach(btn => {
+      btn.addEventListener('click', () => copyContent(btn.dataset.copy, btn));
+    });
+    // carousel nav
+    const cprev = document.getElementById('pp-car-prev');
+    const cnext = document.getElementById('pp-car-next');
+    if (cprev) cprev.addEventListener('click', e => { e.stopPropagation(); carouselIdx--; renderModal(); });
+    if (cnext) cnext.addEventListener('click', e => { e.stopPropagation(); carouselIdx++; renderModal(); });
+
+    // post nav buttons (fixed outside card)
+    document.getElementById('pp-prev-post').disabled = currentIdx === 0;
+    document.getElementById('pp-next-post').disabled = currentIdx === POSTS.length - 1;
+  }
+
+  function copyContent(which, btn) {
+    const p = POSTS[currentIdx];
+    let text = '';
+    if (which === 'caption')  text = p.caption;
+    if (which === 'hashtags') text = p.hashtags;
+    if (which === 'both')     text = p.caption + '\n\n' + p.hashtags;
+    const done = () => {
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copied';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1400);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    } else {
+      fallbackCopy(text, done);
+    }
+  }
+
+  function fallbackCopy(text, cb) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    cb && cb();
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  /* ── EVENT WIRING ─────────────────────────────────────────── */
+
+  document.getElementById('pp-close').addEventListener('click', closeModal);
+  document.getElementById('pp-modal').addEventListener('click', e => {
+    if (e.target.id === 'pp-modal') closeModal();
+  });
+  document.getElementById('pp-prev-post').addEventListener('click', e => {
+    e.stopPropagation();
+    if (currentIdx > 0) { currentIdx--; carouselIdx = 0; renderModal(); }
+  });
+  document.getElementById('pp-next-post').addEventListener('click', e => {
+    e.stopPropagation();
+    if (currentIdx < POSTS.length - 1) { currentIdx++; carouselIdx = 0; renderModal(); }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('pp-modal').classList.contains('open')) return;
+    if (e.key === 'Escape') closeModal();
+    else if (e.key === 'ArrowLeft') {
+      const car = document.getElementById('pp-car-prev');
+      if (car) car.click();
+      else if (currentIdx > 0) { currentIdx--; carouselIdx = 0; renderModal(); }
+    }
+    else if (e.key === 'ArrowRight') {
+      const car = document.getElementById('pp-car-next');
+      if (car) car.click();
+      else if (currentIdx < POSTS.length - 1) { currentIdx++; carouselIdx = 0; renderModal(); }
+    }
+  });
+
+  initProfile();
+  buildGrid();
+})();
+</script>
